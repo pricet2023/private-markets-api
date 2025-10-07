@@ -1,0 +1,85 @@
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+
+// ==========================================
+// GET /investors — fetch all investors
+// ==========================================
+export async function GET() {
+  try {
+    const investors = await prisma.investor.findMany({
+      orderBy: { created_at: 'desc' },
+      include: {
+        investments: {
+          include: {
+            fund: true, // optional: show fund info for each investment
+          },
+        },
+      },
+    });
+
+    return NextResponse.json(investors);
+  } catch (error) {
+    console.error('Error fetching investors:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch investors' },
+      { status: 500 }
+    );
+  }
+}
+
+// ==========================================
+// POST /investors — create a new investor
+// ==========================================
+interface InvestorReqBody {
+  name: string;
+  investor_type?: string;
+  email: string;
+}
+
+export async function POST(request: Request) {
+  try {
+    const body: InvestorReqBody = await request.json();
+    const { name, investor_type, email } = body;
+
+    // Basic validation
+    if (!name || !email) {
+      return NextResponse.json(
+        { error: 'Missing required fields: name or email' },
+        { status: 400 }
+      );
+    }
+
+    // Simple email regex validation
+    const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        { error: 'Invalid email format' },
+        { status: 400 }
+      );
+    }
+
+    const newInvestor = await prisma.investor.create({
+      data: {
+        name,
+        investor_type,
+        email,
+      },
+    });
+
+    return NextResponse.json(newInvestor, { status: 201 });
+  } catch (error: any) {
+    // Handle unique constraint violations (duplicate emails)
+    if (error.code === 'P2002') {
+      return NextResponse.json(
+        { error: 'Investor with this email already exists' },
+        { status: 409 }
+      );
+    }
+
+    console.error('Error creating investor:', error);
+    return NextResponse.json(
+      { error: 'Failed to create investor' },
+      { status: 500 }
+    );
+  }
+}

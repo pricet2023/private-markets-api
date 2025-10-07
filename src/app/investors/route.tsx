@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-// ==========================================
 // GET /investors — fetch all investors
-// ==========================================
 export async function GET() {
   try {
     const investors = await prisma.investor.findMany({
@@ -27,9 +25,7 @@ export async function GET() {
   }
 }
 
-// ==========================================
 // POST /investors — create a new investor
-// ==========================================
 interface InvestorReqBody {
   name: string;
   investor_type?: string;
@@ -67,15 +63,7 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json(newInvestor, { status: 201 });
-  } catch (error: any) {
-    // Handle unique constraint violations (duplicate emails)
-    if (error.code === 'P2002') {
-      return NextResponse.json(
-        { error: 'Investor with this email already exists' },
-        { status: 409 }
-      );
-    }
-
+  } catch (error) {
     console.error('Error creating investor:', error);
     return NextResponse.json(
       { error: 'Failed to create investor' },

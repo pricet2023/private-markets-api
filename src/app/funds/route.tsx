@@ -3,9 +3,13 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET() {
     try {
+        console.log("GET funds");
+
         const funds = await prisma.fund.findMany({
             orderBy: { created_at: 'desc' }, // optional
         });
+
+        console.log("Got ", funds.length, " funds");
 
         return NextResponse.json(funds);
     } catch (error) {
@@ -26,6 +30,7 @@ interface FundPostReqBody {
 
 export async function POST(req: Request) {
     try {
+        console.log("POST fund");
         const body: FundPostReqBody = await req.json();
 
         // Basic input validation
@@ -45,6 +50,7 @@ export async function POST(req: Request) {
             );
         }
 
+        console.log("Sending fund to db");
         // Create the fund
         const newFund = await prisma.fund.create({
             data: {

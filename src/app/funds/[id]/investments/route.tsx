@@ -8,9 +8,9 @@ interface FundInvestmentsReqParams {
 }
 
 // GET /funds/:id/investments — list all investments for a given fund
-export async function GET(_: Request, { params }: FundInvestmentsReqParams) {
+export async function GET(_: Request, context: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params;
+    const { id } = await context.params;
 
     // Quick sanity check for UUID format
     if (!/^[0-9a-fA-F-]{36}$/.test(id)) {
@@ -55,9 +55,9 @@ interface InvestmentRequestBody {
   investment_date: string; // ISO date string
 }
 
-export async function POST(request: Request, { params }: FundInvestmentsReqParams) {
+export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
   try {
-    const { id: fund_id } = params;
+    const { id: fund_id } = await context.params;
     const body: InvestmentRequestBody = await request.json();
 
     const { investor_id, amount_usd, investment_date } = body;

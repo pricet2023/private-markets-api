@@ -1,15 +1,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from '@/lib/prisma';
 
-interface FundReqParams {
-  params: {
-    id: string;
-  };
-}
-
-export async function GET(_: Request, { params }: FundReqParams) {
+export async function GET(_: Request, context: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params;
+    const { id } = await context.params;
+
+    console.log("GET fund with id ", id);
+    
 
     // Optional: quick sanity check for valid UUID format
     if (!/^[0-9a-fA-F-]{36}$/.test(id)) {

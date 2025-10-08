@@ -6,13 +6,6 @@ export async function GET() {
   try {
     const investors = await prisma.investor.findMany({
       orderBy: { created_at: 'desc' },
-      include: {
-        investments: {
-          include: {
-            fund: true, // optional: show fund info for each investment
-          },
-        },
-      },
     });
 
     return NextResponse.json(investors);
@@ -28,7 +21,7 @@ export async function GET() {
 // POST /investors — create a new investor
 interface InvestorReqBody {
   name: string;
-  investor_type?: string;
+  investor_type: 'Individual' | 'Institution' | 'FamilyOffice';
   email: string;
 }
 
@@ -38,9 +31,16 @@ export async function POST(request: Request) {
     const { name, investor_type, email } = body;
 
     // Basic validation
-    if (!name || !email) {
+    if (!name || !email || investor_type) {
       return NextResponse.json(
-        { error: 'Missing required fields: name or email' },
+        { error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
+
+    if (!['Individual', 'Institution', 'Family Office'].includes(investor_type)) {
+      return NextResponse.json(
+        { error: 'Invalid Investor type' },
         { status: 400 }
       );
     }

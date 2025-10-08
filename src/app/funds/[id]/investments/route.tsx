@@ -64,7 +64,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     }
 
     // Validate UUIDs
-    const uuidRegex = /^[0-9a-fA-F-]{36}$/;
+    const uuidRegex = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/
     if (!uuidRegex.test(fund_id) || !uuidRegex.test(investor_id)) {
       return NextResponse.json({ error: 'Invalid UUID format' }, { status: 400 });
     }

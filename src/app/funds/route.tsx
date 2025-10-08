@@ -28,7 +28,7 @@ export async function GET() {
 interface FundPostReqBody {
     name: string,
     vintage_year: number,
-    target_size_usd: Decimal,
+    target_size_usd: number,
     status: 'Fundraising' | 'Investing' | 'Closed',
 }
 
@@ -38,12 +38,12 @@ export async function POST(req: Request) {
         console.log("POST fund");
         const body: FundPostReqBody = await req.json();
 
-        // Basic input validation
+        // Input validation
         const { name, vintage_year, target_size_usd, status } = body;
 
-        if (!name || !status) {
+        if (!name || !status || !vintage_year || !target_size_usd) {
             return NextResponse.json(
-                { error: 'Missing required fields: name, status' },
+                { error: 'Missing required fields' },
                 { status: 400 }
             );
         }
@@ -55,13 +55,23 @@ export async function POST(req: Request) {
             );
         }
 
+        if (target_size_usd < 0) {
+            return NextResponse.json(
+                { error: 'Invalid fund size' },
+                { status: 400 }
+            );
+        }
+
+        // Round size to nearest cent
+        const roundedSize = Math.round(target_size_usd * 100) / 100;
+
         console.log("Sending fund to db");
         // Create the fund in DB
         const newFund = await prisma.fund.create({
             data: {
                 name,
-                vintage_year: vintage_year ? Number(vintage_year) : null,
-                target_size_usd: target_size_usd ? Decimal(target_size_usd).toDecimalPlaces(2) : null,
+                vintage_year: Number(vintage_year),
+                target_size_usd: Decimal(roundedSize),
                 status,
             },
         });
@@ -80,7 +90,7 @@ interface FundPutReqBody {
     id: string,
     name?: string,
     vintage_year?: number,
-    target_size_usd?: Decimal,
+    target_size_usd?: number,
     status?: 'Fundraising' | 'Investing' | 'Closed',
 }
 
@@ -100,13 +110,27 @@ export async function PUT(req: Request) {
             return NextResponse.json({ error: 'Fund not found' }, { status: 404 });
         }
 
+        // Handle target size input
+        let roundedSize: number = 0;
+        if (target_size_usd) {
+            if (target_size_usd < 0) {
+                return NextResponse.json(
+                    { error: 'Invalid fund size' },
+                    { status: 400 }
+                );
+            }
+
+            // Round size to nearest cent
+            roundedSize = Math.round(target_size_usd * 100) / 100;
+        }
+
         // Update fund
         const updatedFund = await prisma.fund.update({
             where: { id },
             data: {
                 name: name ? name : existingFund.name,
                 vintage_year: vintage_year ? Number(vintage_year) : existingFund.vintage_year,
-                target_size_usd: target_size_usd ? Number(target_size_usd) : existingFund.target_size_usd,
+                target_size_usd: target_size_usd ? Decimal(roundedSize) : existingFund.target_size_usd,
                 status: status || existingFund.status,
                 created_at: new Date(),
             },

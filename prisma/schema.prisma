@@ -21,7 +21,7 @@ model Fund {
 model Investor {
   id            String    @id @default(uuid())
   name          String
-  investor_type String?
+  investor_type InvestorType
   email         String    @unique
   created_at    DateTime  @default(dbgenerated("date_trunc('second', now())"))
   investments   Investment[]
@@ -32,7 +32,7 @@ model Investment {
   investor_id     String
   fund_id         String
   amount_usd      Decimal   @db.Decimal(15, 2)
-  investment_date DateTime
+  investment_date DateTime  @db.Date @default(now())
 
   investor Investor @relation(fields: [investor_id], references: [id], onDelete: Cascade)
   fund     Fund     @relation(fields: [fund_id], references: [id], onDelete: Cascade)
@@ -42,4 +42,10 @@ enum FundStatus {
   Fundraising
   Investing
   Closed
+}
+
+enum InvestorType {
+  Individual
+  Institution 
+  FamilyOffice
 }

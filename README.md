@@ -5,10 +5,11 @@ This is a backend project built with **Next.js** and **PostgreSQL** for managing
 ## Dependencies
 - **Docker**
 - **Docker-Compose**
+- **npm**
 
 ## Features
 - **API:** Next.js + TypeScript
-- **Database:** PostgreSQL (Prisma ORM)
+- **Database:** PostgreSQL (Prisma ORM for easy TypeScript integration)
 
 ## API endpoints
 1. **/funds** 
@@ -178,6 +179,10 @@ This is a backend project built with **Next.js** and **PostgreSQL** for managing
     docker-compose up -d
     ```
 
+4. **Access**
+    - **REST API**: http://localhost:3000
+
+
 ## Testing
 Follow the setup guide to start the server and DB, then run:
 ```bash
@@ -187,7 +192,7 @@ You may need to locally run
 ```bash
 npm install
 ```
-to obtain the testing packages
+first to install the required testing packages
 
 
 

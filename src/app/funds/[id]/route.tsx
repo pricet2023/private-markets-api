@@ -6,10 +6,11 @@ export async function GET(_: Request, context: { params: Promise<{ id: string }>
     const { id } = await context.params;
 
     console.log("GET fund with id ", id);
-    
+
 
     // Optional: quick sanity check for valid UUID format
-    if (!/^[0-9a-fA-F-]{36}$/.test(id)) {
+    const uuidRegex = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/
+    if (!uuidRegex.test(id)) {
       return NextResponse.json({ error: 'Invalid fund ID format' }, { status: 400 });
     }
 

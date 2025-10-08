@@ -1,28 +1,24 @@
-import { createServer, Server } from 'http';
-import next from 'next';
-import type { AddressInfo } from 'net';
+import { spawn } from 'child_process';
+import waitOn from 'wait-on';
 
-let server: Server;
-let baseUrl: string;
+let serverProcess: ReturnType<typeof spawn>;
+const TEST_PORT = 3000;
+
+const baseUrl = `http://localhost:${TEST_PORT}`;
 
 export async function startTestServer() {
-  const app = next({ dev: true });
-  const handle = app.getRequestHandler();
-  await app.prepare();
 
-  server = createServer((req, res) => handle(req, res));
-
-  await new Promise<void>((resolve) => {
-    server.listen(0, () => resolve());
+  serverProcess = spawn('docker-compose', ['up', '--build'], {
+    env: { ...process.env },
+    stdio: 'inherit',
   });
 
-  const { port } = server.address() as AddressInfo;
-  baseUrl = `http://localhost:${port}`;
+  await waitOn({ resources: [baseUrl], timeout: 120000 });
   return baseUrl;
 }
 
 export async function stopTestServer() {
-  if (server) {
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+  if (serverProcess) {
+    serverProcess.kill('SIGTERM');
   }
 }

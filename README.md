@@ -178,6 +178,17 @@ This is a backend project built with **Next.js** and **PostgreSQL** for managing
     docker-compose up -d
     ```
 
+## Testing
+Follow the setup guide to start the server and DB, then run:
+```bash
+npm test
+```
+You may need to locally run
+```bash
+npm install
+```
+to obtain the testing packages
+
 
 
 

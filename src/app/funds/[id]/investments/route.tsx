@@ -1,12 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-interface FundInvestmentsReqParams {
-  params: {
-    id: string; // fund id
-  };
-}
-
 // GET /funds/:id/investments — list all investments for a given fund
 export async function GET(_: Request, context: { params: Promise<{ id: string }> }) {
   try {
@@ -37,7 +31,6 @@ export async function GET(_: Request, context: { params: Promise<{ id: string }>
     });
 
     return NextResponse.json({
-      fund,
       investments,
     });
   } catch (error) {
@@ -95,10 +88,6 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
         investor_id,
         amount_usd,
         investment_date: new Date(investment_date),
-      },
-      include: {
-        investor: true,
-        fund: true,
       },
     });
 

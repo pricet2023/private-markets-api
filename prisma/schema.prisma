@@ -12,9 +12,9 @@ model Fund {
   id              String    @id @default(uuid())
   name            String
   vintage_year    Int?
-  target_size_usd Decimal?
+  target_size_usd Decimal?  @db.Decimal(15, 2)
   status          FundStatus
-  created_at      DateTime  @default(now())
+  created_at      DateTime  @default(dbgenerated("date_trunc('second', now())"))
   investments     Investment[]
 }
 
@@ -23,7 +23,7 @@ model Investor {
   name          String
   investor_type String?
   email         String    @unique
-  created_at    DateTime  @default(now())
+  created_at    DateTime  @default(dbgenerated("date_trunc('second', now())"))
   investments   Investment[]
 }
 
@@ -31,7 +31,7 @@ model Investment {
   id              String    @id @default(uuid())
   investor_id     String
   fund_id         String
-  amount_usd      Decimal
+  amount_usd      Decimal   @db.Decimal(15, 2)
   investment_date DateTime
 
   investor Investor @relation(fields: [investor_id], references: [id], onDelete: Cascade)

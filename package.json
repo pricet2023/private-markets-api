@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "jest"
   },
   "dependencies": {
     "@prisma/client": "^6.16.3",
@@ -16,12 +17,17 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/jest": "^30.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/supertest": "^6.0.3",
     "eslint": "^9",
     "eslint-config-next": "15.5.4",
+    "jest": "^30.2.0",
     "prisma": "^6.16.3",
+    "supertest": "^7.1.4",
+    "ts-jest": "^29.4.4",
     "typescript": "^5"
   }
 }

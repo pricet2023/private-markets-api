@@ -1,0 +1,1 @@
+jest.setTimeout(10000); // 10s timeout for async tests

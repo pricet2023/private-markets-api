@@ -1,36 +1,186 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Private Markets API
 
-## Getting Started
+This is a backend project built with **Next.js** and **PostgreSQL** for managing private market funds and investor commitments.
 
-First, run the development server:
+## Dependencies
+- **Docker**
+- **Docker-Compose**
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Features
+- **API:** Next.js + TypeScript
+- **Database:** PostgreSQL (Prisma ORM)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## API endpoints
+1. **/funds** 
+    - **GET** (List all funds) -> Response (200 OK)
+        - Response body
+        ```bash
+        [
+            {
+                "id": "550e8400-e29b-41d4-a716-446655440000",
+                "name": "Titanbay Growth Fund I",
+                "vintage_year": 2024,
+                "target_size_usd": 250000000.00,
+                "status": "Fundraising",
+                "created_at": "2024-01-15T10:30:00Z"
+            }
+        ]
+        ```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+    - **POST** (Create a new fund) -> Response (201 Created)
+        - Request body
+        ```bash
+        {
+            "name": "Titanbay Growth Fund II",
+            "vintage_year": 2025,
+            "target_size_usd": 500000000.00,
+            "status": "Fundraising"
+        }
+        ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+        - Response body
+        ```bash
+        {
+            "id": "660e8400-e29b-41d4-a716-446655440001",
+            "name": "Titanbay Growth Fund II",
+            "vintage_year": 2025,
+            "target_size_usd": 500000000.00,
+            "status": "Fundraising",
+            "created_at": "2024-09-22T14:20:00Z"
+        }
+        ```
+    - **PUT** (Edit an existing fund) -> Response (200 OK)
+        - Request body
+        ```bash
+        {
+            "id": "550e8400-e29b-41d4-a716-446655440000",
+            "name": "Titanbay Growth Fund I",
+            "vintage_year": 2024,
+            "target_size_usd": 300000000.00,
+            "status": "Investing"
+        }
+        ```
 
-## Learn More
+        - Response body
+        ```bash
+        {
+            "id": "550e8400-e29b-41d4-a716-446655440000",
+            "name": "Titanbay Growth Fund I",
+            "vintage_year": 2024,
+            "target_size_usd": 300000000.00,
+            "status": "Investing",
+            "created_at": "2024-01-15T10:30:00Z"
+        }
+        ```
 
-To learn more about Next.js, take a look at the following resources:
+2. **/investors**
+    - **GET** (List all investors) -> Response (200 OK)
+        - Response body
+        ```bash
+        [
+            {
+                "id": "770e8400-e29b-41d4-a716-446655440002",
+                "name": "Goldman Sachs Asset Management",
+                "investor_type": "Institution",
+                "email": "investments@gsam.com",
+                "created_at": "2024-02-10T09:15:00Z"
+            }
+        ]
+        ```
+    
+    - **POST** (Create a new investor) -> Response (201 Created)
+        - Request body
+        ```bash
+        {
+            "name": "CalPERS",
+            "investor_type": "Institution",
+            "email": "privateequity@calpers.ca.gov"
+        }
+        ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+        - Response body
+        ```bash
+        {
+            "id": "880e8400-e29b-41d4-a716-446655440003",
+            "name": "CalPERS",
+            "investor_type": "Institution",
+            "email": "privateequity@calpers.ca.gov",
+            "created_at": "2024-09-22T15:45:00Z"
+        }
+        ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. **/funds/{id}**
+    - **GET** (Get a specific fund) -> Response (200 OK)
+        - Path Parameter: **id** (REQUIRED uuid string)
+        - Response body
+        ```bash
+        {
+            "id": "550e8400-e29b-41d4-a716-446655440000",
+            "name": "Titanbay Growth Fund I",
+            "vintage_year": 2024,
+            "target_size_usd": 250000000.00,
+            "status": "Fundraising",
+            "created_at": "2024-01-15T10:30:00Z"
+        }
+        ``` 
 
-## Deploy on Vercel
+4. **/funds/{fund_id}/investments**
+    - **GET** (List all investments for a specific fund) -> Response (200 OK)
+        - Path Parameter: **id** (REQUIRED uuid string)
+        - Response body
+        ```bash
+        [
+            {
+                "id": "990e8400-e29b-41d4-a716-446655440004",
+                "investor_id": "770e8400-e29b-41d4-a716-446655440002",
+                "fund_id": "550e8400-e29b-41d4-a716-446655440000",
+                "amount_usd": 50000000.00,
+                "investment_date": "2024-03-15"
+            }
+        ]
+        ```
+    
+    - **POST** (Create a new investment to a fund) -> Response (201 Created)
+        - Path Parameter: **id** (REQUIRED uuid string)
+        - Request body
+        ```bash
+        {
+            "investor_id": "880e8400-e29b-41d4-a716-446655440003",
+            "amount_usd": 75000000.00,
+            "investment_date": "2024-09-22"
+        }
+        ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+        - Response body
+        ```bash
+        {
+            "id": "aa0e8400-e29b-41d4-a716-446655440005",
+            "investor_id": "880e8400-e29b-41d4-a716-446655440003",
+            "fund_id": "550e8400-e29b-41d4-a716-446655440000",
+            "amount_usd": 75000000.00,
+            "investment_date": "2024-09-22"
+        }
+        ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Setup Guide
+1. **Clone the repo**
+
+    ```bash
+    git clone https://github.com/pricet2023/private-markets-api
+    cd private-markets-api
+    ```
+2. **Create .env**
+
+    Change or copy env.example to .env
+
+3. **Start services**
+    ```bash
+    docker-compose up -d
+    ```
+
+
+
+
+
+
+
